@@ -131,6 +131,9 @@ static inline u32 rtos_getIrqFlags(void)
 }
 
 #ifdef LIBTWL_ARM7
+
+void rtos_setIrq2Func(u32 mask, rtos_irq_func_t func);
+
 static inline void rtos_ackIrq2Mask(u32 mask)
 {
     REG_IF2 = mask;
