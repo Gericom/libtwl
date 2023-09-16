@@ -1,5 +1,5 @@
 #ifdef LIBTWL_ARM9
-.section .itcm
+.section ".itcm", "ax"
 #else
 .text
 #endif

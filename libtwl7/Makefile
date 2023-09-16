@@ -17,7 +17,14 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(shell basename $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source source/sio ../common/source/rtos ../common/source/ipc ../common/source/card
+SOURCES		:=	source \
+				source/i2c \
+				source/sio \
+				source/sys \
+				../common/source/card \
+				../common/source/ipc \
+				../common/source/mem \
+				../common/source/rtos
 DATA		:=	data
 INCLUDES	:=	include ../common/include
 
