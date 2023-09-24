@@ -40,6 +40,8 @@
 /// @brief Square wave duty cycle of 87.5%.
 #define SOUNDCNT_DUTY_87_5      (6 << 24)
 
+#define SOUNDCNT_DUTY_MASK      (3 << 24)
+
 /// @brief The sound channel must be manually stopped.
 #define SOUNDCNT_MODE_MANUAL    (0 << 27)
 /// @brief The sound channel plays PNT once, then loops LEN infinitely.
@@ -116,6 +118,14 @@ static inline void snd_setChannelVolume(u32 channel, u32 volume)
     ((vu8*)&REG_SOUNDxCNT(channel))[0] = volume;
 }
 
+/// @brief Sets the shift of the given sound channel.
+/// @param channel The channel to set the shift of.
+/// @param shift The shift to set.
+static inline void snd_setChannelShift(u32 channel, u32 shift)
+{
+    REG_SOUNDxCNT(channel) = (REG_SOUNDxCNT(channel) & ~SOUNDCNT_SHIFT_4) | shift;
+}
+
 /// @brief Sets the pan of the given sound channel.
 /// @param channel The channel to set the pan of.
 /// @param pan The pan to set.
@@ -130,6 +140,14 @@ static inline void snd_setChannelPan(u32 channel, u32 pan)
 static inline void snd_setChannelTimer(u32 channel, u16 timer)
 {
     REG_SOUNDxTMR(channel) = timer;
+}
+
+/// @brief Sets the square wave duty cycle of the given sound channel.
+/// @param channel The channel to set the duty cyle value of.
+/// @param duty The duty cycle value to set.
+static inline void snd_setChannelDuty(u32 channel, u32 duty)
+{
+    REG_SOUNDxCNT(channel) = (REG_SOUNDxCNT(channel) & ~SOUNDCNT_DUTY_MASK) | duty;
 }
 
 #ifdef __cplusplus
