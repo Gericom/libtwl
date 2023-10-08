@@ -20,6 +20,7 @@ BUILD		:=	build
 SOURCES		:=	source \
 				source/i2c \
 				source/sio \
+				source/spi \
 				source/sys \
 				../common/source/card \
 				../common/source/ipc \
