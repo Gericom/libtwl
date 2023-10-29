@@ -1,5 +1,8 @@
 #pragma once
 
+#define GFX_OBJ_MAIN    ((vu16*)0x06400000)
+#define GFX_OBJ_SUB     ((vu16*)0x06600000)
+
 #define GFX_OAM_MAIN    ((vu16*)0x07000000)
 #define GFX_OAM_SUB     ((vu16*)0x07000400)
 
