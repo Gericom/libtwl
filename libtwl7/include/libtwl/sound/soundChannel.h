@@ -40,7 +40,7 @@
 /// @brief Square wave duty cycle of 87.5%.
 #define SOUNDCNT_DUTY_87_5      (6 << 24)
 
-#define SOUNDCNT_DUTY_MASK      (3 << 24)
+#define SOUNDCNT_DUTY_MASK      (7 << 24)
 
 /// @brief The sound channel must be manually stopped.
 #define SOUNDCNT_MODE_MANUAL    (0 << 27)
