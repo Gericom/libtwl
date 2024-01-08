@@ -53,9 +53,12 @@ static inline void mem_setGbaCartridgePhi(u32 phi)
 
 #ifdef LIBTWL_ARM9
 
-static inline void mem_setGbaCartridgeCpu(u32 slot2Cpu)
+static inline u32 mem_setGbaCartridgeCpu(u32 slot2Cpu)
 {
-    REG_EXMEMCNT = (REG_EXMEMCNT & ~EXMEMCNT_SLOT2_CPU_ARM7) | slot2Cpu;
+    u32 exMemCnt = REG_EXMEMCNT;
+    u32 oldValue = exMemCnt & EXMEMCNT_SLOT2_CPU_ARM7;
+    REG_EXMEMCNT = (exMemCnt & ~EXMEMCNT_SLOT2_CPU_ARM7) | slot2Cpu;
+    return oldValue;
 }
 
 static inline void mem_setDsCartridgeCpu(u32 slot1Cpu)
