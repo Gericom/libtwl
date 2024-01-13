@@ -12,7 +12,7 @@
 #define SPICNT_BUSY             (1 << 7)
 
 #define SPICNT_DEVICE_PMIC      (0 << 8)
-#define SPICNT_DEVICE_FIRMWARE  (1 << 8)
+#define SPICNT_DEVICE_FLASH     (1 << 8)
 #define SPICNT_DEVICE_TOUCH     (2 << 8)
 
 #define SPICNT_8_BIT            (0 << 10)
