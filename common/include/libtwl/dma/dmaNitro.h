@@ -97,12 +97,18 @@ static inline void dma_ntrStopDirect(int dma)
     REG_DMACNT(dma) = 0;
 }
 
+static inline void dma_ntrWait(int dma)
+{
+    while (REG_DMACNT(dma) & DMACNT_ENABLE);
+}
+
 static inline void dma_ntrCopy16(int dma, const void* src, volatile void* dst, u32 length)
 {
     dma_ntrSetParams(dma, src, dst, 
         DMACNT_ENABLE | DMACNT_MODE_IMMEDIATE | DMACNT_16BIT | 
         DMACNT_SRC_MODE_INCREMENT | DMACNT_DST_MODE_INCREMENT | 
         DMACNT_COUNT(length >> 1));
+    dma_ntrWait(dma);
 }
 
 static inline void dma_ntrCopy32(int dma, const void* src, volatile void* dst, u32 length)
@@ -111,6 +117,7 @@ static inline void dma_ntrCopy32(int dma, const void* src, volatile void* dst, u
         DMACNT_ENABLE | DMACNT_MODE_IMMEDIATE | DMACNT_32BIT | 
         DMACNT_SRC_MODE_INCREMENT | DMACNT_DST_MODE_INCREMENT | 
         DMACNT_COUNT(length >> 2));
+    dma_ntrWait(dma);
 }
 
 #endif
