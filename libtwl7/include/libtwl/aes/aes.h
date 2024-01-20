@@ -102,11 +102,6 @@ static inline void aes_flushOutputFifo(void)
     REG_AES_CNT |= AES_CNT_OUTPUT_FIFO_FLUSH;
 }
 
-static inline void aes_setDmaBlockSize(u32 inputBlockSize, u32 outputBlockSize)
-{
-    REG_AES_CNT &= ~(AES_CNT_INPUT_FIFO_DMA_SIZE_MASK | AES_CNT_OUTPUT_FIFO_DMA_SIZE_MASK) | inputBlockSize | outputBlockSize;
-}
-
 static inline void aes_setMessageAuthenticationCodeSource(u32 macSource)
 {
     REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_MAC_SOURCE_MASK) | macSource;
@@ -117,26 +112,20 @@ static inline bool aes_getMessageAuthenticationCodeResult(void)
     return REG_AES_CNT & AES_CNT_MAC_RESULT_VERIFIED;
 }
 
+static inline void aes_waitKeyBusy(void)
+{
+    while (REG_AES_CNT & AES_CNT_KEY_BUSY);
+}
+
 static inline void aes_setKeySlot(u32 keySlot)
 {
+    aes_waitKeyBusy();
     REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_KEY_SLOT_MASK) | (keySlot << AES_CNT_KEY_SLOT_SHIFT) | AES_CNT_KEY_APPLY;
 }
 
-static inline void aes_setMode(u32 mode)
+static inline void aes_start(u32 inputDmaBlockSize, u32 outputDmaBlockSize, u32 mode, bool irq)
 {
-    REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_MODE_MASK) | mode;
-}
-
-static inline void aes_start(bool irq)
-{
-    if (irq)
-    {
-        REG_AES_CNT |= AES_CNT_IRQ | AES_CNT_ENABLE;
-    }
-    else
-    {
-        REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_IRQ) | AES_CNT_ENABLE;
-    }
+    REG_AES_CNT = (irq ? AES_CNT_IRQ : 0) | AES_CNT_ENABLE | mode | inputDmaBlockSize | outputDmaBlockSize;
 }
 
 static inline void aes_waitBusy(void)
@@ -172,6 +161,7 @@ static inline void aes_setMessageAuthenticationCode(const aes_u128_t* messageAut
 
 static inline void aes_setKey(u32 keySlot, const aes_u128_t* key)
 {
+    aes_waitKeyBusy();
     (&REG_AES_KEY0)[keySlot * 3].words[0] = key->words[0];
     (&REG_AES_KEY0)[keySlot * 3].words[1] = key->words[1];
     (&REG_AES_KEY0)[keySlot * 3].words[2] = key->words[2];
@@ -180,6 +170,7 @@ static inline void aes_setKey(u32 keySlot, const aes_u128_t* key)
 
 static inline void aes_setKeyX(u32 keySlot, const aes_u128_t* keyX)
 {
+    aes_waitKeyBusy();
     (&REG_AES_ID0)[keySlot * 3].words[0] = keyX->words[0];
     (&REG_AES_ID0)[keySlot * 3].words[1] = keyX->words[1];
     (&REG_AES_ID0)[keySlot * 3].words[2] = keyX->words[2];
@@ -188,6 +179,7 @@ static inline void aes_setKeyX(u32 keySlot, const aes_u128_t* keyX)
 
 static inline void aes_setKeyY(u32 keySlot, const aes_u128_t* keyY)
 {
+    aes_waitKeyBusy();
     (&REG_AES_SEED0)[keySlot * 3].words[0] = keyY->words[0];
     (&REG_AES_SEED0)[keySlot * 3].words[1] = keyY->words[1];
     (&REG_AES_SEED0)[keySlot * 3].words[2] = keyY->words[2];
@@ -196,8 +188,15 @@ static inline void aes_setKeyY(u32 keySlot, const aes_u128_t* keyY)
 
 static inline void aes_setKeyXY(u32 keySlot, const aes_u128_t* keyX, const aes_u128_t* keyY)
 {
-    aes_setKeyX(keySlot, keyX);
-    aes_setKeyY(keySlot, keyY);
+    aes_waitKeyBusy();
+    (&REG_AES_ID0)[keySlot * 3].words[0] = keyX->words[0];
+    (&REG_AES_ID0)[keySlot * 3].words[1] = keyX->words[1];
+    (&REG_AES_ID0)[keySlot * 3].words[2] = keyX->words[2];
+    (&REG_AES_ID0)[keySlot * 3].words[3] = keyX->words[3];
+    (&REG_AES_SEED0)[keySlot * 3].words[0] = keyY->words[0];
+    (&REG_AES_SEED0)[keySlot * 3].words[1] = keyY->words[1];
+    (&REG_AES_SEED0)[keySlot * 3].words[2] = keyY->words[2];
+    (&REG_AES_SEED0)[keySlot * 3].words[3] = keyY->words[3];
 }
 
 #ifdef __cplusplus
