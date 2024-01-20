@@ -205,7 +205,7 @@ void codec_writeRegister(u8 reg, u8 data);
 /// @brief Sets the current codec register page. This function cannot be used
 ///        when the current page is 255.
 /// @param page The new register page to use.
-void codec_setPage(u8 page)
+static inline void codec_setPage(u8 page)
 {
     codec_writeRegister(CODEC_REG_PAGE_CONTROL, page);
 }
