@@ -92,19 +92,10 @@ static inline u32 aes_getOutputFifoCount(void)
     return (REG_AES_CNT & AES_CNT_OUTPUT_FIFO_COUNT_MASK) >> AES_CNT_OUTPUT_FIFO_COUNT_SHIFT;
 }
 
-static inline void aes_flushInputFifo(void)
+static inline void aes_reset(void)
 {
-    REG_AES_CNT |= AES_CNT_INPUT_FIFO_FLUSH;
-}
-
-static inline void aes_flushOutputFifo(void)
-{
-    REG_AES_CNT |= AES_CNT_OUTPUT_FIFO_FLUSH;
-}
-
-static inline void aes_setMessageAuthenticationCodeSource(u32 macSource)
-{
-    REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_MAC_SOURCE_MASK) | macSource;
+    REG_AES_CNT = AES_CNT_INPUT_FIFO_FLUSH | AES_CNT_OUTPUT_FIFO_FLUSH;
+    REG_AES_CNT = AES_CNT_INPUT_FIFO_FLUSH | AES_CNT_OUTPUT_FIFO_FLUSH;
 }
 
 static inline bool aes_getMessageAuthenticationCodeResult(void)
@@ -123,9 +114,9 @@ static inline void aes_setKeySlot(u32 keySlot)
     REG_AES_CNT = (REG_AES_CNT & ~AES_CNT_KEY_SLOT_MASK) | (keySlot << AES_CNT_KEY_SLOT_SHIFT) | AES_CNT_KEY_APPLY;
 }
 
-static inline void aes_start(u32 inputDmaBlockSize, u32 outputDmaBlockSize, u32 mode, bool irq)
+static inline void aes_start(u32 flags)
 {
-    REG_AES_CNT = (irq ? AES_CNT_IRQ : 0) | AES_CNT_ENABLE | mode | inputDmaBlockSize | outputDmaBlockSize;
+    REG_AES_CNT = flags | AES_CNT_ENABLE;
 }
 
 static inline void aes_waitBusy(void)
