@@ -1,5 +1,6 @@
 #pragma once
 #include "../math/mathVec3.h"
+#include "../math/mathFixedMtx.h"
 
 enum
 {
@@ -202,6 +203,10 @@ typedef enum
 
 #define GX_VTX_PACK(a,b)    ((u16)(a) | ((b) << 16))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void gx_mtxMode(GxMtxMode mode)
 {
     REG_GX_MTX_MODE = mode;
@@ -230,6 +235,35 @@ static inline void gx_mtxRestore(u32 id)
 static inline void gx_mtxIdentity(void)
 {
     REG_GX_MTX_IDENTITY = 0;
+}
+
+extern void gx_fifoSend64(u32 command, const u32* params);
+extern void gx_fifoSend48(u32 command, const u32* params);
+extern void gx_fifoSend36(u32 command, const u32* params);
+
+static inline void gx_mtxLoad44(const mtx44_t* matrix)
+{
+    gx_fifoSend64(GX_CMD_MTX_LOAD_44, (const u32*)matrix);
+}
+
+static inline void gx_mtxLoad43(const mtx43_t* matrix)
+{
+    gx_fifoSend48(GX_CMD_MTX_LOAD_43, (const u32*)matrix);
+}
+
+static inline void gx_mtxMult44(const mtx44_t* matrix)
+{
+    gx_fifoSend64(GX_CMD_MTX_MULT_44, (const u32*)matrix);
+}
+
+static inline void gx_mtxMult43(const mtx43_t* matrix)
+{
+    gx_fifoSend48(GX_CMD_MTX_MULT_43, (const u32*)matrix);
+}
+
+static inline void gx_mtxMult33(const mtx33_t* matrix)
+{
+    gx_fifoSend36(GX_CMD_MTX_MULT_33, (const u32*)matrix);
 }
 
 static inline void gx_mtxScale(fx32 x, fx32 y, fx32 z)
@@ -309,6 +343,11 @@ static inline void gx_texCoord(s16 s, s16 t)
     REG_GX_TEXCOORD = (t << 16) | (u16)s;
 }
 
+static inline void gx_normal(int x, int y, int z)
+{
+    REG_GX_NORMAL = (x & 0x3FF) | ((y & 0x3FF) << 10) | (z << 20);
+}
+
 static inline void gx_vtx16(fx16 x, fx16 y, fx16 z)
 {
     REG_GX_VTX_16 = GX_VTX_PACK(x, y);
@@ -350,6 +389,26 @@ static inline void gx_endVtxs(void)
     REG_GX_END_VTXS = 0;
 }
 
+static inline void gx_lightVector(int light, int x, int y, int z)
+{
+    REG_GX_LIGHT_VECTOR = (x & 0x3FF) | ((y & 0x3FF) << 10) | ((z & 0x3FF) << 20) | (light << 30);
+}
+
+static inline void gx_lightColor(int light, u32 color)
+{
+    REG_GX_LIGHT_COLOR = (color & 0x7FFF) | (light << 30);
+}
+
+static inline void gx_diffuseAmbient(u32 diffuse, bool setDiffuseVtxColor, u32 ambient)
+{
+    REG_GX_DIF_AMB = (diffuse & 0x7FFF) | (setDiffuseVtxColor ? 0x8000 : 0) | (ambient << 16);
+}
+
+static inline void gx_specularEmission(u32 specular, bool useShininessTable, u32 emission)
+{
+    REG_GX_SPE_EMI = (specular & 0x7FFF) | (useShininessTable ? 0x8000 : 0) | (emission << 16);
+}
+
 static inline void gx_swapBuffers(GxXluSortMode xluSortMode, GxDepthMode depthMode)
 {
     REG_GX_SWAP_BUFFERS = xluSortMode | (depthMode << 1);
@@ -359,3 +418,7 @@ static inline void gx_viewport(u8 x1, u8 y1, u8 x2, u8 y2)
 {
     REG_GX_VIEWPORT = x1 | (y1 << 8) | (x2 << 16) | (y2 << 24);
 }
+
+#ifdef __cplusplus
+}
+#endif
