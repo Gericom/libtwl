@@ -1,7 +1,7 @@
 #pragma once
 
-#define REG_SOUNDCNT                (*(vu32*)0x04000500)
-#define REG_SOUNDBIAS               (*(vu32*)0x04000504)
+#define REG_SOUNDCNT                (*(vu16*)0x04000500)
+#define REG_SOUNDBIAS               (*(vu16*)0x04000504)
 
 #define SOUNDCNT_MASTER_VOLUME(x)   ((x) << 0)
 
