@@ -1,7 +1,7 @@
 #pragma once
 
 #define REG_SCFG_A9ROM  (*(vu8*)0x04004000)
-#define REG_SCFG_A7ROM  (*(vu8*)0x04004000)
+#define REG_SCFG_A7ROM  (*(vu8*)0x04004001)
 #define REG_SCFG_CLK    (*(vu16*)0x04004004)
 
 #ifdef LIBTWL_ARM9
