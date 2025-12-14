@@ -25,6 +25,7 @@ SOURCES		:=	source \
 				source/mem \
 				source/rtos \
 				source/gfx \
+				source/sys \
 				../common/source/card \
 				../common/source/ipc \
 				../common/source/mem \
