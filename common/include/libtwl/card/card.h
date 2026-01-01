@@ -119,6 +119,29 @@ extern "C"
     void card_romCpuWrite(const u32* src, u32 words);
     void card_romCpuWriteUnaligned(const u8* src, u32 words);
 
+    static inline void card_spiWaitBusy(void)
+    {
+        while (REG_MCCNT0 & MCCNT0_SPI_BUSY);
+    }
+
+    static inline u8 card_spiTransferByte(u16 rate, u8 data)
+    {
+        card_spiWaitBusy();
+        REG_MCCNT0 = MCCNT0_MODE_SPI | MCCNT0_SPI_HOLD_CS | MCCNT0_ENABLE | rate;
+        REG_MCD0 = data;
+        card_spiWaitBusy();
+        return REG_MCD0;
+    }
+
+    static inline u8 card_spiTransferLastByte(u16 rate, u8 data)
+    {
+        card_spiWaitBusy();
+        REG_MCCNT0 = MCCNT0_MODE_SPI | MCCNT0_ENABLE | rate;
+        REG_MCD0 = data;
+        card_spiWaitBusy();
+        return REG_MCD0;
+    }
+
 #ifdef __cplusplus
 }
 #endif
