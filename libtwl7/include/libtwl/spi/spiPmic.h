@@ -125,10 +125,10 @@ static inline void pmic_setMicrophoneAmplifierGain(u32 gain)
 
 static inline void pmic_setBacklightLevel(u32 backlightLevel)
 {
-    u32 control = pmic_readRegister(PMIC_REG_CONTROL);
+    u32 control = pmic_readRegister(PMIC_REG_BACKLIGHT);
     control &= ~PMIC_BACKLIGHT_MASK;
     control |= backlightLevel;
-    pmic_writeRegister(PMIC_REG_CONTROL, control);
+    pmic_writeRegister(PMIC_REG_BACKLIGHT, control);
 }
 
 /// @brief Only on DSi causes the device to reboot. Also works in DS mode.
