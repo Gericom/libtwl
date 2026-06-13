@@ -29,8 +29,10 @@ static void insertReadyList(rtos_thread_t* thread)
     else
     {
         while (t->priority > prio)
+        {
             t = t->next;
-        
+        }
+
         thread->next = t;
         rtos_thread_t* newPrev = t->prev;
         thread->prev = newPrev;
@@ -151,6 +153,27 @@ void rtos_wakeupThread(rtos_thread_t* thread)
         return;
     }
 
+    if (thread->inQueue)
+    {
+        // Remove from thread queue
+        if (thread->prev == NULL)
+        {
+            thread->inQueue->head = thread->next;
+        }
+        else
+        {
+            thread->prev->next = thread->next;
+        }
+        if (thread->next != NULL)
+        {
+            thread->next->prev = thread->prev;
+        }
+
+        thread->prev = NULL;
+        thread->next = NULL;
+        thread->inQueue = NULL;
+    }
+
     insertReadyList(thread);
 
     reschedule();
@@ -163,8 +186,10 @@ void rtos_sleepThread(rtos_thread_t* thread)
     u32 irq = rtos_disableIrqs();
 
     if (thread == NULL)
+    {
         thread = gRtosState.curThread;
-    
+    }
+
     if (thread->state == RTOS_THREAD_STATE_DEAD || thread->state == RTOS_THREAD_STATE_SLEEPING)
     {
         rtos_restoreIrqs(irq);
@@ -194,7 +219,14 @@ void rtos_sleepThread(rtos_thread_t* thread)
 
 void rtos_joinThread(rtos_thread_t* thread)
 {
-    rtos_queueThread(rtos_getCurThread(), &thread->joinQueue);
+    u32 irq = rtos_disableIrqs();
+    {
+        if (thread->state != RTOS_THREAD_STATE_DEAD)
+        {
+            rtos_queueThread(rtos_getCurThread(), &thread->joinQueue);
+        }
+    }
+    rtos_restoreIrqs(irq);
 }
 
 void rtos_queueThread(rtos_thread_t* thread, rtos_thread_queue_t* queue)
