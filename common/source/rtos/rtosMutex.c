@@ -81,6 +81,21 @@ void rtos_unlockMutex(rtos_mutex_t* mutex)
 
     if (--mutex->lockCount == 0)
     {
+        // Remove from thread object list
+        if (mutex->obj.prev == NULL)
+        {
+            mutex->owner->objListHead = mutex->obj.next;
+        }
+        else
+        {
+            mutex->obj.prev->next = mutex->obj.next;
+        }
+        if (mutex->obj.next != NULL)
+        {
+            mutex->obj.next->prev = mutex->obj.prev;
+        }
+        mutex->obj.prev = NULL;
+        mutex->obj.next = NULL;
         mutex->owner = NULL;
         rtos_wakeupQueue(&mutex->queue);
     }
